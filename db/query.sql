@@ -26,5 +26,25 @@ WHERE e.roleID = r.id and
 r.departmentID = d.id and 
 m.id = e.managerID
 order by e.id;
+
+-- add department 
+INSERT INTO departments(departmentName)
+VALUES ();
+
+-- add role
+INSERT INTO roles(title, salary, departmentID)
+VALUES ('Hot Dog vendor', 150000, 8);
+
+-- add employee Sam Pull as an IT analyst reporting to Lee Thargic
+INSERT INTO employees(firstName, lastName, roleID, managerID)
+VALUES ('Sam', 'Pull', 6, 6);
+
+-- update employee Dee Zaster from roleID 2 = purchasing analyst to  roleID 11 = purchasing manager 
+UPDATE employees
+SET roleID = 11, managerID = 17
+WHERE id = 2;
+
+
+ 
  
  
