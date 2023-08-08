@@ -37,9 +37,9 @@ inquirer
   .then((response)=>{
     console.log(response)
     if (response.trackerOptions == 1){
-      //sql query to show depts need to get fancy table!
+      //sql query to show depts 
       db.query('SELECT * FROM departments', function (err, results) {
-        console.log(results);
+        console.table(results);
       });
     }
     else if(response.trackerOptions ==2){
@@ -48,7 +48,7 @@ inquirer
         if (err) {
           console.log(err);
         }
-        console.log(result);
+        console.table(result);
       });
     }
     else if(response.trackerOptions == 3){
@@ -57,7 +57,7 @@ inquirer
         if (err) {
           console.log(err);
         }
-        console.log(result);
+        console.table(result);
       });
     }
     else if(response.trackerOptions == 4){
@@ -66,14 +66,18 @@ inquirer
     }
     else if (response.trackerOptions == 5){
       //function to ask three qs to add role
+      //add a query to populate an object to help select department (by name, return deptID)
       addRole()
     }
     else if (response.trackerOptions == 6){
       //function to as 4 qs to add employee
+      //add a query to populate an object to help select role (by name, return roleID) and manager (by name, return managerID)
       addEmployee()
     }
     else if (response.trackerOptions ==7){
       //function to update employee
+      //add question for which employee ID to update
+      //add a query to populate an object that can be passed in as 'objection' to populate the defaults during the update questions
       updateEmployee(objection)
     }
     else {console.log('something is out of sorts')}

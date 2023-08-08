@@ -13,7 +13,7 @@ VALUES ('Human Resources'),
   ('Executive');
 
 INSERT INTO roles(title, salary, departmentID)
-VALUES ('HR Representative', 48500, 1),
+VALUES ('HR Representative', 8500, 1),
 ('Purchasing Analyst', 60000, 2),
 ('Product Planner', 80000, 3),
 ('Production Scientist', 60000, 4),
