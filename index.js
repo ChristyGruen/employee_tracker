@@ -1,5 +1,20 @@
 const fs = require('fs');
 const inquirer = require('inquirer');
+const mysql = require('mysql2');
+
+// Connect to database
+const db = mysql.createConnection(
+  {
+    host: 'localhost',
+    // MySQL username,
+    user: 'root',
+    // MySQL password
+    password: 'MySQL1_Chris!',
+    database: 'employee_tracker_db'
+  },
+  console.log(`Connected to the books_db database.`)
+);
+
 
 //first question leads to subsets of questions
 inquirer
@@ -22,13 +37,28 @@ inquirer
   .then((response)=>{
     console.log(response)
     if (response.trackerOptions == 1){
-      //sql query to show depts
+      //sql query to show depts need to get fancy table!
+      db.query('SELECT * FROM departments', function (err, results) {
+        console.log(results);
+      });
     }
     else if(response.trackerOptions ==2){
       //sql query to show roles
+      db.query("SELECT r.title as jobTitle, r.id as roleID, d.departmentName, r.salary as salary from roles r, departments d where r.departmentID = d.id;", (err, result) => {
+        if (err) {
+          console.log(err);
+        }
+        console.log(result);
+      });
     }
     else if(response.trackerOptions == 3){
       //sql query to show employees
+      db.query("SELECT e.id as employeeID, e.firstName, e.lastName, r.title as jobTitle, d.departmentName, r.salary as salary, concat(m.firstName,' ',m.lastName) as manager from employees m, employees e,  roles r, departments d where e.roleID = r.id and r.departmentID = d.id and m.id = e.managerID order by e.id;", (err, result) => {
+        if (err) {
+          console.log(err);
+        }
+        console.log(result);
+      });
     }
     else if(response.trackerOptions == 4){
       //ask dept name then sql query to add dept
@@ -133,6 +163,8 @@ function addDept(){
     })
   };
 
+
+//the function is set up to take this object and display values as the default for the updateEmployee function!  just need to populate this with the selection info used for updating the employee info.
 let objection = {
   id:7,
   fName: 'Clara',
@@ -140,7 +172,7 @@ let objection = {
   eRole: 'Shipping Clerk',
   eMgr: 9
 }
-console.log(objection.fName)
+
   //need to use employeeID or something to select one employee to update
   //could you pull the employee info into an object and use that for the defaults for the questions?  That way, all entries can be updated if you want and it's still easy, default is no update.
   function updateEmployee(objection){
