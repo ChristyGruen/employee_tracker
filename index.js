@@ -67,7 +67,8 @@ inquirer
     else if (response.trackerOptions == 5){
       //function to ask three qs to add role
       //add a query to populate an object to help select department (by name, return deptID)
-      addRole()
+      // addRole()
+      createDeptList()
     }
     else if (response.trackerOptions == 6){
       //function to as 4 qs to add employee
@@ -78,12 +79,15 @@ inquirer
       //function to update employee
       //add question for which employee ID to update
       //add a query to populate an object that can be passed in as 'objection' to populate the defaults during the update questions
-      updateEmployee(objection)
+      let selectedEmpID = 4;
+      defaultUpdateEmployee(selectedEmpID);
     }
     else {console.log('something is out of sorts')}
-
+    
   })
-//could create an object to loop through instead of this ifffffff statement?
+//could create an object to loop through instead of this ifffffff statement?  or could use switch case break
+
+//function to add a department
 function addDept(){
   inquirer
   .prompt([
@@ -96,11 +100,28 @@ function addDept(){
   .then((response)=>{
     console.log(response)
     //write to dept table
+    db.query(`INSERT INTO departments(departmentName) VALUES ("${response.deptName}");`, (err, result) => {
+      if (err) {
+        console.log(err);
+      }
+      console.log(`Department ${response.deptName} added to the database`)
+
+    })
   })
 };
 
+function createDeptList(){
+  db.query(`select departmentName as name, id as value from departments;`, (err, result) => {
+    if (err) {
+      console.log(err);
+    }
+    console.log('this is the result from createdeptlist')
+    console.log(result)
+    addRole(result)
+  })
+}
 
-  function addRole(){
+function addRole(roleDeptList){
     inquirer
     .prompt([
       {
@@ -117,82 +138,93 @@ function addDept(){
         type: 'list',
         message: 'Which department does the role belong to?',
         name: 'roleDept',
-        choices:['Human Resources',
-        'Purchasing',
-        'Planning',
-        'Production',
-        'Development',
-        'IT',
-        'Shipping',
-        'Marketing',
-        'Executive'] //get list of departments from db to keep updated
-        //would be awesome to have it returned as an object with name and value populated from departmentName and id, then it would be super easy to get the deptID for input into the table.
+        choices: roleDeptList
       }
     ])
     .then((response)=>{
       console.log(response)
       //write to role table
+      db.query(`INSERT INTO roles(title, salary, departmentID) VALUES ("${response.roleTitle}",${response.roleSalary},${response.roleDept});`, (err, result) => {
+        if (err) {
+          console.log(err);
+        }
+        console.log(`Role ${response.roleTitle} with salary ${response.roleSalary} and deptID ${response.roleDept} added to the database`)
+  
+      })
     })
   };
 
-  function addEmployee(){
-    inquirer
-    .prompt([
-      {
-        type: 'input',
-        message: "What is the employee's first name?",
-        name: 'firstName'
-      },
-      {
-        type: 'input',
-        message: "What is the employee's last name?",
-        name: 'lastName'
-      },
-      {
-        type: 'list',
-        message: "What is the employee's role?",
-        name: 'empRoll',
-        choices:[] //get list of roles from db to keep updated (object with name=title and value = id)
-      },
-      {
-        type: 'list',
-        message: "Who is the employee's manager?",
-        name: 'empMgr',
-        choices:[] //get list of managers from db based on dept to keep updated (object with name = concat names, id = managerID)
+function addEmployee(){
+  inquirer
+  .prompt([
+    {
+      type: 'input',
+      message: "What is the employee's first name?",
+      name: 'firstName'
+    },
+    {
+      type: 'input',
+      message: "What is the employee's last name?",
+      name: 'lastName'
+    },
+    {
+      type: 'list',
+      message: "What is the employee's role?",
+      name: 'empRoll',
+      choices:[] //get list of roles from db to keep updated (object with name=title and value = id)
+    },
+    {
+      type: 'list',
+      message: "Who is the employee's manager?",
+      name: 'empMgr',
+      choices:[] //get list of managers from db based on dept to keep updated (object with name = concat names, id = managerID)
+    }
+  ])
+  .then((response)=>{
+    console.log(response)
+    //write to employee table
+  })
+};
+
+
+// select employee ID number for employee update
+function defaultUpdateEmployee(empID){
+  inquirer
+  .prompt([
+    {
+      type: 'input',
+      message: "What is the employee's ID number?",
+      name: 'selectEmpID'
+    },
+  ])
+  .then((response)=>{
+    // console.log(response)
+    // console.log(`employeeID is ${response.selectEmpID}`);
+    db.query(`select * from employees where id = ${response.selectEmpID};`, (err, result) => {
+      if (err) {
+        console.log(err);
       }
-    ])
-    .then((response)=>{
-      console.log(response)
-      //write to employee table
+      resultObject = result[0]
+      updateEmployee(resultObject)
     })
-  };
-
-
-//the function is set up to take this object and display values as the default for the updateEmployee function!  just need to populate this with the selection info used for updating the employee info.
-let objection = {
-  id:7,
-  fName: 'Clara',
-  lName: 'Nett',
-  eRole: 'Shipping Clerk',
-  eMgr: 9
-}
-
-  //need to use employeeID or something to select one employee to update
-  //could you pull the employee info into an object and use that for the defaults for the questions?  That way, all entries can be updated if you want and it's still easy, default is no update.
+  })
+};
+//function to update employee info based on selected employee ID, default info for the selected employee supplied
   function updateEmployee(objection){
+    console.log(`info passed into the updateEmployee function is ${objection}`);
     inquirer
     .prompt([
       {
         type: 'input',
         message: "What is the employee's first name?",
-        name: 'firstName',
-        default: objection.fName
+        name: 'firstNamey',
+        default: objection.firstName
       },
       {
         type: 'input',
         message: "What is the employee's last name?",
-        name: 'lastName',
-        default: objection.lName
+        name: 'lastNamey',
+        default: objection.lastName
       },
       {
         type: 'list',
@@ -215,7 +247,7 @@ let objection = {
           'Senior Manager',
           'Senior Manager', 
           'Director'], //get list of roles from db to keep updated (object with name=title and value = id)
-        default: objection.eRole
+        default: objection.roleID
       },
       {
         type: 'list',
@@ -230,7 +262,7 @@ let objection = {
         'Marv Ellis', 
         'Lee Thargic',
         'Holly Day'], //get list of managers from db based on dept to keep updated (object with name = concat names, id = managerID)
-        default: objection.eMgr
+        default: objection.managerID
       }
     ])
     .then((response)=>{
