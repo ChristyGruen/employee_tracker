@@ -73,7 +73,9 @@ inquirer
     else if (response.trackerOptions == 6){
       //function to as 4 qs to add employee
       //add a query to populate an object to help select role (by name, return roleID) and manager (by name, return managerID)
-      addEmployee()
+      // addEmployee()
+      createRoleList()
+      createManagerList()
     }
     else if (response.trackerOptions ==7){
       //function to update employee
@@ -87,7 +89,7 @@ inquirer
   })
 //could create an object to loop through instead of this ifffffff statement?  or could use switch case break
 
-//function to add a department
+///////////////////function to add a department
 function addDept(){
   inquirer
   .prompt([
@@ -110,6 +112,8 @@ function addDept(){
   })
 };
 
+
+/////////////////two functions to add role
 function createDeptList(){
   db.query(`select departmentName as name, id as value from departments;`, (err, result) => {
     if (err) {
@@ -119,9 +123,10 @@ function createDeptList(){
     console.log(result)
     addRole(result)
   })
-}
+};
 
 function addRole(roleDeptList){
+    createDeptList()
     inquirer
     .prompt([
       {
@@ -142,7 +147,8 @@ function addRole(roleDeptList){
       }
     ])
     .then((response)=>{
-      console.log(response)
+      // console.log(response)
+      // console.log(response.roleDept.value)
       //write to role table
       db.query(`INSERT INTO roles(title, salary, departmentID) VALUES ("${response.roleTitle}",${response.roleSalary},${response.roleDept});`, (err, result) => {
         if (err) {
@@ -154,7 +160,30 @@ function addRole(roleDeptList){
     })
   };
 
-function addEmployee(){
+////////////////////// three functions to add Employees
+  function createRoleList(){
+    db.query(`select title as name, id as value from roles;`, (err, result) => {
+      if (err) {
+        console.log(err);
+      }
+      console.log('this is the result from createRoleList')
+      console.log(result)
+      // createManagerList(result)  //this doesn't work here
+    })
+  };
+
+  function createManagerList(onion){
+    db.query(`select  as name, id as value from employees where departmentID = ${onion.departmentID};`, (err, result) => {
+      if (err) {
+        console.log(err);
+      }
+      console.log('this is the result from createManagerList')
+      console.log(result)
+      addEmployee(result)
+    })
+  };
+
+function addEmployee(pickle){
   inquirer
   .prompt([
     {
@@ -183,10 +212,17 @@ function addEmployee(){
   .then((response)=>{
     console.log(response)
     //write to employee table
+    db.query(`INSERT INTO employees (firstName, lastName, roleID, managerID) VALUES ("${response.roleTitle}",${response.roleSalary},${response.roleDept});`, (err, result) => {
+      if (err) {
+        console.log(err);
+      }
+      console.log(`Role ${response.roleTitle} with salary ${response.roleSalary} and deptID ${response.roleDept} added to the database`)
+
+    })
   })
 };
 
-
+////////////////////two functions to update employee (also should use the prep functions from addEmployee)
 // select employee ID number for employee update
 function defaultUpdateEmployee(empID){
   inquirer
