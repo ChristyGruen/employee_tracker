@@ -1,3 +1,4 @@
+-- this was used as the starting block for the queries used in the final code. Additional updates were needed to fit the flow of the functions, etc.
 
 -- view all departments: formatted table showing department names and department ids
 SELECT * from departments;
@@ -38,6 +39,67 @@ SET roleID = 11, managerID = 17
 WHERE id = 2;
 
 
+
+
+
+
+
+-- additional query work saved below
+use employee_tracker_db;
+
+select * from employees;
+
+-- create list of manager e.ids
+Select distinct managerID from employees
+order by managerID;
+
+
+
+SELECT concat(e.firstName,' ',e.lastName) as manager, e.id as value from employees e where 
+
+
+SELECT r.id, r.departmentID
+FROM roles r
+WHERE r.id = 12;
+
+select * from departments where id = 4;
+
+select id from departments where id = (SELECT r.departmentID
+FROM roles r
+WHERE r.id = 12);
+
+select id from roles where departmentID = (select id from departments where id = (SELECT r.departmentID
+FROM roles r
+WHERE r.id in (12)));
+
+select * from employees where managerID = (select id from roles where departmentID = (select id from departments where id = (SELECT r.departmentID
+FROM roles r
+WHERE r.id in (12))));
+
+concat(e.firstName,' ',e.lastName) as manager, e.id as value
+
+-- this just might work   replace 4 with a variable passed in from role
+SELECT e.firstName, e.lastName, r.title, d.departmentName, d.id
+from roles r
+	left join employees e on e.roleID = r.id
+    inner join departments d on d.id = r.departmentID
+where
+	e.roleID in (Select distinct managerID from employees)
+	and d.id = 4; 
+    
+   --  remove all the line breaks
+SELECT e.firstName, e.lastName, r.title, d.departmentName, d.id from roles r left join employees e on e.roleID = r.id inner join departments d on d.id = r.departmentID where e.roleID in (Select distinct managerID from employees) and d.id = 6; 
+
+-- create manager choices list by role selected
+SELECT concat(e.firstName,' ',e.lastName) as manager, e.id as value from roles r left join employees e on e.roleID = r.id inner join departments d on d.id = r.departmentID where e.roleID in (Select distinct managerID from employees) and d.id = (Select r.departmentID from roles r where r.ID = 12); 
+
+get department id by role
+Select r.departmentID from roles r where r.ID = 12;
+
+SELECT concat(e.firstName,' ',e.lastName) as manager, e.id as value from roles r left join employees e on e.roleID = r.id inner join departments d on d.id = r.departmentID where e.roleID in (Select distinct managerID from employees);
+
+
+UPDATE employees SET firstName = 'Leigh', lastName = 'Downey', roleID = 11, managerID = 17 WHERE id = 1; 
  
  
  

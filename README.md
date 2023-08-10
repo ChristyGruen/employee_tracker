@@ -46,7 +46,7 @@
   <br>
   For questions, comments and concerns, please log an issue at: 
   <br>
-  <a href="https://github.com/ChristyGruen/note_taker/issues" target="_blank">Note taker issues</a>
+  <a href="https://github.com/ChristyGruen/employee_tracker/issues" target="_blank">Employee Tracker issues</a>
 
   ## References
   none
