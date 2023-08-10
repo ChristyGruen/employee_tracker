@@ -25,7 +25,8 @@
   
       To run the app, type node server.js in the terminal and enter. All of the most important questions in the world will be answered
   Watch a demo of the app here:
-  <https://watch.screencastify.com/v/LGnvXAt6R6cMVc3untRV>
+  tbd
+  <!-- <https://watch.screencastify.com/v/LGnvXAt6R6cMVc3untRV> -->
   
   ## License
     This project is covered under the MIT license.
@@ -43,10 +44,11 @@
   For further information, access my gitHub profile here:
   <https://github.com/ChristyGruen>
   <br>
-  For questions, comments and concerns, contact me here:
-  <none>
+  For questions, comments and concerns, please log an issue at: 
+  <br>
+  <a href="https://github.com/ChristyGruen/note_taker/issues" target="_blank">Note taker issues</a>
 
   ## References
-  none provided by:
+  none
   <none>
   
