@@ -172,44 +172,6 @@ function addRole(roleDeptList){
     })
   };
 
-  // function getDeptFromRole(roleSelected){
-  //   db.query(`select title as name, id as value from roles;`, (err, result) => {
-  //     if (err) {
-  //       console.log(err);
-  //     }
-  //     console.log('this is the result from createRoleList')
-  //     console.log(result)
-  //     return(result)
-  //   })
-  // };
-
-
-
-
-  // function selectManagerbyDept(selectedRole){
-  //   db.query(`Select distinct managerID from employees order by managerID;`,(err,result)=>{
-  //     if(err){
-  //       console.log(err);
-  //     }
-  //     console.log('this is the result from createManagerIDList')
-  //     console.log(result)
-  //     return(result)
-  //   }) 
-  // }
-
-
-
-  // function createManagerList(argRoleID, argMgrID){
-  //   db.query(`select  as manager  as name, id as value from employees where e.managerID ;`, (err, result) => {
-  //     if (err) {
-  //       console.log(err);
-  //     }
-  //     console.log('this is the result from createManagerList')
-  //     console.log(result)
-  //     addEmployee(passRole, result)
-  //   })
-  // };
-
 let empData = {}
 /////////////////addEmployee first function
 function addEmployee(roleList){
@@ -306,68 +268,135 @@ function defaultUpdateEmployee(empID){
         console.log(err);
       }
       resultObject = result[0]
-      updateEmployee(resultObject)
+      console.log('line271')
+      console.log(resultObject)
+      createRoleList(resultObject)
     })
   })
 };
+
+function createRoleList(defaults){
+  db.query(`select title as name, id as value from roles;`, (err, result) => {
+    if (err) {
+      console.log(err);
+    }
+    console.log('this is the result from createRoleList')
+    console.log(result)
+    updateEmployee(result, defaults)
+  })
+};
+
+
+//this will hold updateEmployee data to pass to the updateEmployee2 function
+let updateEmpData = {}
+
 //function to update employee info based on selected employee ID, default info for the selected employee supplied
-  function updateEmployee(objection){
-    console.log(`info passed into the updateEmployee function is ${objection}`);
+  function updateEmployee(rList, defaults2){
+    console.log(rList)
+    console.log(defaults2)
     inquirer
     .prompt([
       {
         type: 'input',
         message: "What is the employee's first name?",
         name: 'firstNamey',
-        default: objection.firstName
+        default: defaults2.firstName
       },
       {
         type: 'input',
         message: "What is the employee's last name?",
         name: 'lastNamey',
-        default: objection.lastName
+        default: defaults2.lastName
       },
       {
         type: 'list',
         message: "What is the employee's role?",
-        name: 'empRole',
-        choices:['HR Representative',
-          'Purchasing Analyst',
-          'Product Planner',
-          'Production Scientist',
-          'Development Scientist',
-          'IT Analyst',
-          'Shipping Clerk',
-          'Marketing Analyst',
-          'Supervisor',
-          'Manager',
-          'Manager',
-          'Manager',
-          'Manager',
-          'Senior Manager',
-          'Senior Manager',
-          'Senior Manager', 
-          'Director'], //get list of roles from db to keep updated (object with name=title and value = id)
-        default: objection.roleID
+        name: 'empRoley',
+        choices: rList,
+        default: defaults2.roleID
       },
-      {
-        type: 'list',
-        message: "Who is the employee's manager?",
-        name: 'empMgr',
-        choices:['Don Key',
-        'Ella Fant',
-        'Felix Cited',
-        'Jack Pott',
-        'Izzy Goudinov',
-        'Kerri Oki',
-        'Marv Ellis', 
-        'Lee Thargic',
-        'Holly Day'], //get list of managers from db based on dept to keep updated (object with name = concat names, id = managerID)
-        default: objection.managerID
-      }
+      // {
+      //   type: 'list',
+      //   message: "Who is the employee's manager?",
+      //   name: 'empMgr',
+      //   choices:['Don Key',
+      //   'Ella Fant',
+      //   'Felix Cited',
+      //   'Jack Pott',
+      //   'Izzy Goudinov',
+      //   'Kerri Oki',
+      //   'Marv Ellis', 
+      //   'Lee Thargic',
+      //   'Holly Day'], //get list of managers from db based on dept to keep updated (object with name = concat names, id = managerID)
+      //   default: selectEmp.managerID
+      // }
     ])
     .then((response)=>{
       console.log(response)
-      //write to employee table
+      updateEmpData = response
+      createManagerList2(updateEmpData, defaults2)
+      //go to next function in daisy chain
+
+
     })
+  };
+
+  function createManagerList2(updateEmpData2, defaults3){
+////////////////////////////////////////////////////////////////////////////////
+  console.log('line344')
+  console.log(updateEmpData2)
+  console.log(defaults3)
+  db.query(`SELECT concat(e.firstName,' ',e.lastName) as manager, e.id as value from roles r left join employees e on e.roleID = r.id inner join departments d on d.id = r.departmentID where e.roleID in (Select distinct managerID from employees) and d.id = (Select r.departmentID from roles r where r.id = ${updateEmpData2.empRoley}); `,(err,result)=>{
+  if(err){
+    console.log(err);
+  }
+  console.log('row351')
+  console.log(result)
+  if(result.length == 0){
+
+  db.query(`SELECT concat(e.firstName,' ',e.lastName) as manager, e.id as value from roles r left join employees e on e.roleID = r.id inner join departments d on d.id = r.departmentID where e.roleID in (Select distinct managerID from employees);`, (err,result)=>{
+    if(err){
+      console.log(err);
+    }
+    console.log('line360')
+    console.log(result)
+    mgrlist= result
+    updateEmployee2(mgrlist,updateEmpData2, defaults3)
+  })
+  } else {
+    console.log('this is the result from createManagerList');
+    console.log(result);
+    mgrlist = result
+    updateEmployee2(mgrlist,updateEmpData2, defaults3)
+  }
+})
+}
+////////////////////////////////////////////////////////////////////////////////
+  function updateEmployee2(mgrlist2, updateEmpData3, defaults4){
+    //do stuff
+    console.log(mgrlist2)
+    console.log(updateEmpData3)
+    console.log(defaults4)
+
+    inquirer
+    .prompt([
+    {
+      type: 'list',
+      message: "Who is the employee's manager?",
+      name: 'empMgr2',
+      choices: mgrlist2,
+      default: defaults4.managerID
+    }
+  ])
+  .then((response)=>{
+    console.log(response)
+    //update employee table
+    db.query(`UPDATE employees SET firstName ="${updateEmpData3.firstNamey}", lastName = "${updateEmpData3.lastNamey}", roleID = ${updateEmpData3.empRoley}, managerID = ${response.empMgr2} where id =${defaults4.id};`, (err, result) => {
+      if (err) {
+        console.log(err);
+      }
+      console.log(`Employee ${updateEmpData3.firstNamey} ${updateEmpData3.lastNamey} with roleID ${updateEmpData3.empRoley} and managerID ${response.empMgr2} updated in the db `)
+    })
+
+  })
   }
