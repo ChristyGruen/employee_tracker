@@ -25,7 +25,7 @@
   
       To run the app, type node server.js in the terminal and enter. All of the most important questions in the world will be answered
   Watch a demo of the app here:
-  tbd
+  https://watch.screencastify.com/v/xUBlXazZZwBvWhMk6A6w
   <!-- <https://watch.screencastify.com/v/LGnvXAt6R6cMVc3untRV> -->
   
   ## License

@@ -39,6 +39,7 @@ inquirer
       //sql query to show depts 
       db.query('SELECT * FROM departments', function (err, results) {
         console.table(results);
+        console.log("=========================================================")
         start()
       });
     }
@@ -49,6 +50,7 @@ inquirer
           console.log(err);
         }
         console.table(result);
+        console.log("=========================================================")
         start()
       });
     }
@@ -59,6 +61,7 @@ inquirer
           console.log(err);
         }
         console.table(result);
+        console.log("=========================================================")
         start()
       });
     }
@@ -104,6 +107,7 @@ function addDept(){
         console.log(err);
       }
       console.log(`Department ${response.deptName} added to the database`)
+      console.log("=========================================================")
       start();
 
     })
@@ -151,6 +155,7 @@ function addRole(roleDeptList){
           console.log(err);
         }
         console.log(`Role ${response.roleTitle} with salary ${response.roleSalary} and deptID ${response.roleDept} added to the database`)
+        console.log("=========================================================")
         start()
   
       })
@@ -241,6 +246,7 @@ function addEmployee2(listee,datae){
       console.log(err);
     }
     console.log(`Employee ${datae.firstName} ${datae.lastName} with roleID ${datae.empRole} and managerID ${response.empMgr} added to the db `)
+    console.log("=========================================================")
     start()
   })
 })
@@ -373,6 +379,7 @@ let updateEmpData = {}
         console.log(err);
       }
       console.log(`Employee ${updateEmpData3.firstNamey} ${updateEmpData3.lastNamey} with roleID ${updateEmpData3.empRoley} and managerID ${response.empMgr2} updated in the db `)
+      console.log("=========================================================")
       start()
     })
 
