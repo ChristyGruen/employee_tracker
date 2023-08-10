@@ -75,7 +75,7 @@ inquirer
       //add a query to populate an object to help select role (by name, return roleID) and manager (by name, return managerID)
       // addEmployee()
       createRoleList()
-      createManagerList()
+      // createManagerList()
     }
     else if (response.trackerOptions ==7){
       //function to update employee
@@ -126,7 +126,7 @@ function createDeptList(){
 };
 
 function addRole(roleDeptList){
-    createDeptList()
+    // createDeptList()
     inquirer
     .prompt([
       {
@@ -168,22 +168,52 @@ function addRole(roleDeptList){
       }
       console.log('this is the result from createRoleList')
       console.log(result)
-      // createManagerList(result)  //this doesn't work here
-    })
-  };
-
-  function createManagerList(onion){
-    db.query(`select  as name, id as value from employees where departmentID = ${onion.departmentID};`, (err, result) => {
-      if (err) {
-        console.log(err);
-      }
-      console.log('this is the result from createManagerList')
-      console.log(result)
       addEmployee(result)
     })
   };
 
-function addEmployee(pickle){
+  // function getDeptFromRole(roleSelected){
+  //   db.query(`select title as name, id as value from roles;`, (err, result) => {
+  //     if (err) {
+  //       console.log(err);
+  //     }
+  //     console.log('this is the result from createRoleList')
+  //     console.log(result)
+  //     return(result)
+  //   })
+  // };
+
+
+
+
+  // function selectManagerbyDept(selectedRole){
+  //   db.query(`Select distinct managerID from employees order by managerID;`,(err,result)=>{
+  //     if(err){
+  //       console.log(err);
+  //     }
+  //     console.log('this is the result from createManagerIDList')
+  //     console.log(result)
+  //     return(result)
+  //   }) 
+  // }
+
+
+
+  // function createManagerList(argRoleID, argMgrID){
+  //   db.query(`select  as manager  as name, id as value from employees where e.managerID ;`, (err, result) => {
+  //     if (err) {
+  //       console.log(err);
+  //     }
+  //     console.log('this is the result from createManagerList')
+  //     console.log(result)
+  //     addEmployee(passRole, result)
+  //   })
+  // };
+
+let empData = {}
+/////////////////addEmployee first function
+function addEmployee(roleList){
+  console.log(roleList);
   inquirer
   .prompt([
     {
@@ -199,28 +229,63 @@ function addEmployee(pickle){
     {
       type: 'list',
       message: "What is the employee's role?",
-      name: 'empRoll',
-      choices:[] //get list of roles from db to keep updated (object with name=title and value = id)
-    },
+      name: 'empRole',
+      choices: roleList //get list of roles from db to keep updated (object with name=title and value = id)
+    }
+  ])
+  .then((response)=>{
+    console.log('line237')
+    empData = response
+    console.log(empData)
+    createManagerList(empData)
+  })
+};
+/////////////////////////// function to select manager list
+function createManagerList(edata){
+  console.log('line245')
+  console.log(edata)
+  db.query(`SELECT concat(e.firstName,' ',e.lastName) as manager, e.id as value from roles r left join employees e on e.roleID = r.id inner join departments d on d.id = r.departmentID where e.roleID in (Select distinct managerID from employees) and d.id = (Select r.departmentID from roles r where r.ID = ${edata.empRole}); `,(err,result)=>{
+  if(err){
+    console.log(err);
+  }
+  if(result.length >0){
+  console.log('this is the result from createManagerList');
+  console.log(result);
+  addEmployee2(result,edata)
+  } else {
+  db.query(`SELECT concat(e.firstName,' ',e.lastName) as manager, e.id as value from roles r left join employees e on e.roleID = r.id inner join departments d on d.id = r.departmentID where e.roleID in (Select distinct managerID from employees);`, (err,result)=>{
+    if(err){
+      console.log(err);
+    }
+    console.log('line260')
+    console.log(result)
+    addEmployee2(result,edata)
+  })
+  }
+})
+}
+
+///////////////////second function for add employees because I don't know how to do async
+function addEmployee2(listee,datae){
+  inquirer
+  .prompt([
     {
       type: 'list',
       message: "Who is the employee's manager?",
       name: 'empMgr',
-      choices:[] //get list of managers from db based on dept to keep updated (object with name = concat names, id = managerID)
+      choices:listee //get list of managers from db based on dept to keep updated (object with name = concat names, id = managerID)
     }
   ])
   .then((response)=>{
-    console.log(response)
-    //write to employee table
-    db.query(`INSERT INTO employees (firstName, lastName, roleID, managerID) VALUES ("${response.roleTitle}",${response.roleSalary},${response.roleDept});`, (err, result) => {
-      if (err) {
-        console.log(err);
-      }
-      console.log(`Role ${response.roleTitle} with salary ${response.roleSalary} and deptID ${response.roleDept} added to the database`)
-
-    })
+  //write to employee table
+  db.query(`INSERT INTO employees (firstName, lastName, roleID, managerID) VALUES ("${datae.firstName}","${datae.lastName}",${datae.empRole},${response.empMgr});`, (err, result) => {
+    if (err) {
+      console.log(err);
+    }
+    console.log(`Employee ${datae.firstName} ${datae.lastName} with roleID ${datae.empRole} and managerID ${response.empMgr} added to the db `)
   })
-};
+})
+}
 
 ////////////////////two functions to update employee (also should use the prep functions from addEmployee)
 // select employee ID number for employee update
